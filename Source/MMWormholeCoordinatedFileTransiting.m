@@ -50,11 +50,7 @@
          options:0
          error:&error
          byAccessor:^(NSURL *newURL) {
-             NSError *writeError = nil;
-             
-             success = [data writeToURL:newURL
-                                options:NSDataWritingAtomic | self.additionalFileWritingOptions
-                                  error:&writeError];
+             success = [data writeToURL:newURL atomically:YES];
          }];
         
         if (!success) {

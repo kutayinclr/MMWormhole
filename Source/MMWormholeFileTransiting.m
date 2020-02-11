@@ -115,7 +115,9 @@
         if (!success) {
             return NO;
         }
+        data = nil;
     }
+    
     
     return YES;
 }

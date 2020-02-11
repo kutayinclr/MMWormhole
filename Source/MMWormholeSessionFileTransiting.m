@@ -49,10 +49,6 @@
         return NO;
     }
     
-    if ([WCSession isSupported] == false) {
-        return NO;
-    }
-    
     if (messageObject) {
         NSData *data = [NSKeyedArchiver archivedDataWithRootObject:messageObject];
         
@@ -60,20 +56,22 @@
             return NO;
         }
         
-        NSString *tempDir = [self messagePassingDirectoryPath];
-        
-        if (tempDir == nil) {
-            tempDir = NSTemporaryDirectory();
+        if ([self.session isReachable]) {
+            NSString *tempDir = [self messagePassingDirectoryPath];
+            
+            if (tempDir == nil) {
+                tempDir = NSTemporaryDirectory();
+            }
+            
+            NSString *tempPath = [tempDir stringByAppendingPathComponent:identifier];
+            NSURL *tempURL = [NSURL fileURLWithPath:tempPath];
+            
+            NSError *fileError = nil;
+            
+            [data writeToURL:tempURL options:NSDataWritingAtomic error:&fileError];
+            
+            [self.session transferFile:tempURL metadata:@{@"identifier" : identifier}];
         }
-        
-        NSString *tempPath = [tempDir stringByAppendingPathComponent:identifier];
-        NSURL *tempURL = [NSURL fileURLWithPath:tempPath];
-        
-        NSError *fileError = nil;
-        
-        [data writeToURL:tempURL options:NSDataWritingAtomic error:&fileError];
-        
-        [self.session transferFile:tempURL metadata:@{@"identifier" : identifier}];
     }
     
     return NO;
